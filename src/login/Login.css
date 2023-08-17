@@ -1,0 +1,13 @@
+.position {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.button-align {
+  display: flex;
+}
+
+.input-align {
+  margin-bottom: 20px;
+  background-color: blue;
+}
