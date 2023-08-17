@@ -1,65 +1,146 @@
-import { Card, Container, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import "./Login.css";
-import ButtonComponent from "../components/button/Button";
-import TypographyComponent from "../components/typography/TypographyComponent";
-import InputField from "../components/input-field/InputField";
-import CheckButton from "../components/check-button/CheckButton";
+import React, { useState } from "react";
+import { TextField, Button, Typography, Snackbar } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import axios from "axios";
 
-const Login = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [phoneNum, setPhoneNum] = useState();
-
-  // const fetchData = () => {
-  //   axios.post("url").then;
-  // };
-
-  return (
-    <Card>
-      <TypographyComponent
-        typoVariant="h3"
-        typoAlign="center"
-        typoText="SignUp Screen"
-      ></TypographyComponent>
-      <Container className="position">
-        <InputField
-          className="input-align"
-          inputRequired={true}
-          inputLabel="Email"
-          inputVariant="outlined"
-        ></InputField>
-        <InputField
-          className="input-align"
-          inputRequired={true}
-          inputLabel="Password"
-          inputVariant="outlined"
-        ></InputField>
-        <InputField
-          inputRequired={true}
-          inputLabel="Phone Number"
-          inputVariant="outlined"
-        ></InputField>
-        <CheckButton
-          isControl="checkbox"
-          checkBoxLabel="save the details"
-          checkBoxLabelPlacement="end"
-        />
-        <Typography className="button-align">
-          <ButtonComponent
-            buttonVariant="contained"
-            buttonColor="primary"
-            buttonText="Submit"
-          ></ButtonComponent>
-          <ButtonComponent
-            buttonVariant="contained"
-            buttonColor="error"
-            buttonText="Reset"
-          ></ButtonComponent>
-        </Typography>
-      </Container>
-    </Card>
-  );
+const formContainerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh",
+  backgroundColor: "#76b852",
 };
 
-export default Login;
+const registerFormStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  padding: "44px",
+  border: "1px solid #ccc",
+  borderRadius: "8px",
+  backgroundColor: "#ffffff",
+};
+
+const formFieldStyle = {
+  margin: "8px",
+};
+
+const successMessageStyle = {
+  textAlign: "center",
+  margin: "16px",
+};
+
+const API_ENDPOINT = "";
+
+export default function App() {
+  const [values, setValues] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+  const [valid, setValid] = useState(false);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setValues((values) => ({
+      ...values,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (values.firstName && values.lastName && values.email) {
+      setValid(true);
+      try {
+        const response = await axios.post(API_ENDPOINT, values);
+
+        if (response.status === 200) {
+          setSubmitted(true);
+        } else {
+          console.error("Registration failed");
+        }
+      } catch (error) {
+        console.error("Error sending registration data", error);
+      }
+    } else {
+      setSubmitted(true);
+    }
+  };
+
+  return (
+    <div style={formContainerStyle}>
+      <form style={registerFormStyle} onSubmit={handleSubmit}>
+        {submitted && valid && (
+          <div style={successMessageStyle}>
+            <Typography variant="h5">
+              Welcome {values.firstName} {values.lastName}
+            </Typography>
+            <Typography>Your registration was successful!</Typography>
+          </div>
+        )}
+        {!valid && (
+          <TextField
+            style={formFieldStyle}
+            label="First Name"
+            fullWidth
+            name="firstName"
+            value={values.firstName}
+            onChange={handleInputChange}
+            error={submitted && !values.firstName}
+            helperText={
+              submitted && !values.firstName && "Please enter a first name"
+            }
+          />
+        )}
+        {!valid && (
+          <TextField
+            style={formFieldStyle}
+            label="Last Name"
+            fullWidth
+            name="lastName"
+            value={values.lastName}
+            onChange={handleInputChange}
+            error={submitted && !values.lastName}
+            helperText={
+              submitted && !values.lastName && "Please enter a last name"
+            }
+          />
+        )}
+        {!valid && (
+          <TextField
+            style={formFieldStyle}
+            label="Email"
+            fullWidth
+            type="email"
+            name="email"
+            value={values.email}
+            onChange={handleInputChange}
+            error={submitted && !values.email}
+            helperText={
+              submitted && !values.email && "Please enter an email address"
+            }
+          />
+        )}
+        {!valid && (
+          <Button
+            style={formFieldStyle}
+            variant="contained"
+            color="primary"
+            type="submit"
+          >
+            Register
+          </Button>
+        )}
+      </form>
+      {/* <Snackbar open={submitted && valid} autoHideDuration={6000}>
+        <Alert severity="success">
+          Welcome {values.firstName} {values.lastName}! Your registration was
+          successful.
+        </Alert>
+      </Snackbar> */}
+    </div>
+  );
+}
